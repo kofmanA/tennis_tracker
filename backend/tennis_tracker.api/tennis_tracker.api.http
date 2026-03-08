@@ -1,0 +1,102 @@
+@tennis_tracker.api_HostAddress = http://localhost:5101
+
+### 1. Register player 1
+POST {{tennis_tracker.api_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "player699",
+  "password": "Tennis123!",
+  "ntrpLevel": "4.0",
+  "location": "New York"
+}
+
+### 2. Register player 2 (partner)
+POST {{tennis_tracker.api_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "player420",
+  "password": "Tennis123!",
+  "ntrpLevel": "3.5",
+  "location": "New York"
+}
+
+### 3. Login as player1
+# @name login
+POST {{tennis_tracker.api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "player1",
+  "password": "Tennis123!"
+}
+
+### 4. Extract token
+@token = {{login.response.body.token}}
+
+//@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3IiwidW5pcXVlX25hbWUiOiJwbGF5ZXIxIiwiZXhwIjoxNzcyNzU2MTI0LCJpc3MiOiJ0ZW5uaXNfdHJhY2tlciIsImF1ZCI6InRlbm5pc190cmFja2VyX3VzZXJzIn0.x_WNiLbWRufwzQcWuOQ4aCaMIcg4CaouL6NJuopQ4g0
+### 5. Get all sessions (empty at first)
+GET {{tennis_tracker.api_HostAddress}}/sessions
+Authorization: Bearer {{token}}
+
+### 6. Create first session
+# @name createSession
+POST {{tennis_tracker.api_HostAddress}}/sessions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "date": "2026-03-10T14:00:00",
+  "durationMinutes": 90,
+  "location": "Central Park Courts",
+  "partnerUserId": 2,
+  "notes": "Worked on backhand slice"
+}
+
+### 7. Create second session
+POST {{tennis_tracker.api_HostAddress}}/sessions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "date": "2026-03-08T10:00:00",
+  "durationMinutes": 60,
+  "location": "City Tennis Club",
+  "partnerUserId": 2,
+  "notes": "Practice serves"
+}
+
+### 8. Get all sessions (should show 2)
+GET {{tennis_tracker.api_HostAddress}}/sessions
+Authorization: Bearer {{token}}
+
+### 9. Get specific session
+@sessionId = {{createSession.response.body.id}}
+GET {{tennis_tracker.api_HostAddress}}/sessions/{{sessionId}}
+Authorization: Bearer {{token}}
+
+### 10. Update session
+PUT {{tennis_tracker.api_HostAddress}}/sessions/{{sessionId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "date": "2026-03-10T15:00:00",
+  "durationMinutes": 120,
+  "location": "Central Park Courts - Court 3",
+  "partnerUserId": 2,
+  "notes": "Extended session - volleys and overheads"
+}
+
+### 11. Get total hours
+GET {{tennis_tracker.api_HostAddress}}/sessions/stats/total-hours
+Authorization: Bearer {{token}}
+
+### 12. Delete session
+DELETE {{tennis_tracker.api_HostAddress}}/sessions/{{sessionId}}
+Authorization: Bearer {{token}}
+
+### 13. Verify deletion
+GET {{tennis_tracker.api_HostAddress}}/sessions
+Authorization: Bearer {{token}}
