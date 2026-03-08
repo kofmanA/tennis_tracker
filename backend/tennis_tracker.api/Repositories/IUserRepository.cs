@@ -8,7 +8,5 @@ namespace tennis_tracker.api.Repositories
         Task<User?> GetUserByIdAsync(int id);
 
         Task CreateAsync(User user);
-
-        Task DeleteAsync(int id);
     }
 }
